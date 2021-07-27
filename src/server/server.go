@@ -3,7 +3,7 @@ package main
 import (
   "fmt"
   "net"
-  "io"
+  "encoding/gob"
   "log"
   "time"
 )
@@ -17,37 +17,15 @@ type Message struct {
 }
 
 func handleConnection(conn net.Conn) {
-  // make a temporary bytes var to read from the connection
-	tmp := make([]byte, 1024)
-	// make 0 length data bytes (since we'll be appending)
-	data := make([]byte, 0)
-	// keep track of full length read
-	length := 0
-
-	// loop through the connection stream, appending tmp to data
-	for {
-		// read to the tmp var
-		n, err := conn.Read(tmp)
-		if err != nil {
-			// log if not normal error
-			if err != io.EOF {
-				fmt.Printf("Read error - %s\n", err)
-			}
-			break
-		}
-
-		// append read data to full data
-		data = append(data, tmp[:n]...)
-
-		// update total read var
-		length += n
+    dec := gob.NewDecoder(conn) // Will read from network.
+    // Decode (receive) and print the values.
+	var q Message
+	err := dec.Decode(&q)
+	if err != nil {
+		log.Fatal("decode error 1:", err)
 	}
+	fmt.Printf("RECEIVED %d %s\n", q.MsgType, string(q.MsgBuffer))
 
-	// log bytes read
-	fmt.Printf("READ  %d bytes\n", length)
-  fmt.Println("message ",string(data))
-
-  conn.Write([]byte("ok"))
 	//allDone <- "done"
 }
 

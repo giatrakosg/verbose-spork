@@ -18,7 +18,7 @@ var messages = make(chan string)
 
 func sendInit(c net.Conn){
     enc := gob.NewEncoder(c)
-    err := enc.Encode(Message{3, []byte("Pythagoras")})
+    err := enc.Encode(Message{1, []byte("Pythagoras")})
 	if err != nil {
 		log.Fatal("encode error:", err)
 	}
