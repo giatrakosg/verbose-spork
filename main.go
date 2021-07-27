@@ -1,11 +1,11 @@
-package main
+package github.com/verbose-spork
 
 import (
   "fmt"
   "net"
   "io"
   "log"
-//  "bufio"
+  // "bufio"
   "context"
   "time"
 )
@@ -59,7 +59,8 @@ func handleConnection(conn net.Conn) {
 	fmt.Printf("READ  %d bytes\n", length)
   fmt.Println("message ",string(data))
 
-	allDone <- "done"
+  conn.Write([]byte("ok"))
+	//allDone <- "done"
 }
 
 func server() {
