@@ -1,32 +1,16 @@
-package github.com/verbose-spork
+package main
 
 import (
   "fmt"
   "net"
   "io"
   "log"
-  // "bufio"
-  "context"
   "time"
 )
 
 var allDone = make(chan string)
 
-func client () {
-    var d net.Dialer
-    ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
-    defer cancel()
 
-    conn, err := d.DialContext(ctx, "tcp", "localhost:8080")
-    if err != nil {
-      log.Fatalf("Failed to dial: %v", err)
-    }
-    defer conn.Close()
-
-    if _, err := conn.Write([]byte("Hello, World!")); err != nil {
-      log.Fatal(err)
-    }
-}
 
 func handleConnection(conn net.Conn) {
   // make a temporary bytes var to read from the connection
@@ -87,7 +71,5 @@ func server() {
 func main() {
   go server()
   time.Sleep(2 * time.Second)
-
-  go client()
   <- allDone
 }
