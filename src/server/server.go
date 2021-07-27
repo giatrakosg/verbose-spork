@@ -10,7 +10,11 @@ import (
 
 var allDone = make(chan string)
 
-
+// Message type describing data send
+type Message struct {
+    MsgType int32;
+    MsgBuffer []byte
+}
 
 func handleConnection(conn net.Conn) {
   // make a temporary bytes var to read from the connection

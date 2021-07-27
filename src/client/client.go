@@ -1,14 +1,32 @@
-package client
+package main
 
 import (
     "net"
     "context"
     "log"
     "time"
+    "fmt"
+    "encoding/gob"
 )
+// Message type describing data send
+type Message struct {
+    MsgType int32;
+    MsgBuffer []byte
+}
 
+var messages = make(chan string)
+
+func sendInit(c net.Conn){
+    enc := gob.NewEncoder(c)
+    err := enc.Encode(Message{3, []byte("Pythagoras")})
+	if err != nil {
+		log.Fatal("encode error:", err)
+	}
+    messages <- "Send hello world message"
+}
 func main()  {
     var d net.Dialer
+
     ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
     defer cancel()
 
@@ -18,8 +36,8 @@ func main()  {
     }
     defer conn.Close()
 
-    if _, err := conn.Write([]byte("Hello, World!")); err != nil {
-      log.Fatal(err)
-    }
+    go sendInit(conn)
+    fmt.Println(<- messages)
+
 
 }
