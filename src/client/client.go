@@ -7,6 +7,8 @@ import (
     "time"
     "fmt"
     "encoding/gob"
+    "os/exec"
+    "io/ioutil"
 )
 // Message type describing data send
 type Message struct {
@@ -17,11 +19,25 @@ type Message struct {
 var messages = make(chan string)
 
 func sendInit(c net.Conn){
+
+    files, err := ioutil.ReadDir("/tmp/")
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    for _, file := range files {
+        fmt.Println(file.Name())
+    }
+
     enc := gob.NewEncoder(c)
-    err := enc.Encode(Message{1, []byte("Pythagoras")})
-	if err != nil {
-		log.Fatal("encode error:", err)
-	}
+    err = enc.Encode(Message{1, []byte("Pythagoras")})
+  	if err != nil {
+  		log.Fatal("encode error:", err)
+  	}
+    cmd := exec.Command("ls")
+    log.Printf("Running command and waiting for it to finish...")
+    err = cmd.Run()
+    log.Printf("Command finished with error: %v", err)
     messages <- "Send hello world message"
 }
 func main()  {
