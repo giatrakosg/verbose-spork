@@ -5,7 +5,6 @@ import (
   "net"
   "encoding/gob"
   "log"
-  "time"
 )
 
 var allDone = make(chan string)
@@ -17,14 +16,20 @@ type Message struct {
 }
 
 func handleConnection(conn net.Conn) {
-    dec := gob.NewDecoder(conn) // Will read from network.
-    // Decode (receive) and print the values.
+    fmt.Printf("Accepted connection from %s\n",conn.RemoteAddr())
+
+    // Instantiate new gob decoder for decoding type Message
+    // from bytes
+
+    dec := gob.NewDecoder(conn)
 	var q Message
-	err := dec.Decode(&q)
+
+    err := dec.Decode(&q)
 	if err != nil {
-		log.Fatal("decode error 1:", err)
+		log.Fatal("Error decoding object in client", err)
 	}
-	fmt.Printf("RECEIVED %d %s\n", q.MsgType, string(q.MsgBuffer))
+
+    fmt.Printf("RECEIVED %d %s\n", q.MsgType, string(q.MsgBuffer))
 
 	//allDone <- "done"
 }
@@ -32,7 +37,7 @@ func handleConnection(conn net.Conn) {
 func server() {
   l, err := net.Listen("tcp", ":8080")
   if err != nil {
-    log.Fatal(err)
+    log.Fatal("Server: Error in listening   ",err)
   }
   defer l.Close()
   for {
@@ -51,7 +56,7 @@ func server() {
 }
 // Main function
 func main() {
-  go server()
-  time.Sleep(2 * time.Second)
-  <- allDone
+    fmt.Println("Starting server....")
+    go server()
+    <- allDone
 }

@@ -8,8 +8,8 @@ import (
     "fmt"
     "encoding/gob"
     // "os/exec"
-    // "io/ioutil"
-    "os"
+    "io/ioutil"
+    // "os"
 )
 // Message type describing data send
 type Message struct {
@@ -20,26 +20,19 @@ type Message struct {
 var messages = make(chan string)
 
 func sendInit(c net.Conn){
+    const searchDir = "./data/"
+    files, err := ioutil.ReadDir(searchDir)
+    if err != nil {
+        log.Fatal("error reading dir",err)
 
-    // files, err := ioutil.ReadDir("./data/")
-    // if err != nil {
-    //     log.Fatal(err)
-    // }
-    fd, _  := os.Open("./data/file1.txt")
-    go hashFile(fd)
-
-    // for _, file := range files {
-    //     fd, _  := os.Open(file.Name())
-    //     go hashFile(fd)
-    //
-    // }
-
+    }
+    hashDirectory(searchDir,files)
     enc := gob.NewEncoder(c)
-    err := enc.Encode(Message{1, []byte("Pythagoras")})
+    err = enc.Encode(Message{1, []byte("hello")})
   	if err != nil {
   		log.Fatal("encode error:", err)
   	}
-    messages <- "Send hello world message"
+    messages <- "Send init message"
 }
 func main()  {
     var d net.Dialer
