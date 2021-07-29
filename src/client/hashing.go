@@ -23,9 +23,6 @@ type ListMessage struct {
     DirHashes []FileHashPair
 
 }
-func Create() (*ListMessage) {
-    return new(ListMessage)
-}
 func hashFile(f *os.File,res chan<- FileHashPair)  {
     h := sha256.New()
     if _, err := io.Copy(h, f); err != nil {
